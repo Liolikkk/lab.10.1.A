@@ -1,0 +1,121 @@
+#include <iostream>
+#include <iomanip>
+#include <Windows.h>
+#include <string>
+#include <vector>
+
+using namespace std;
+
+enum Majors { RI = 1, IK, PZ, AI, KN, SA };
+
+#pragma pack(push, 1) 
+struct Student {
+    string return_prizv() {
+        return this->prizv;
+    }
+
+    unsigned short return_course() {
+        return this->course;
+    }
+
+    string return_major() {
+        switch (this->major) {
+        case RI: return "RI";
+        case IK: return "IK";
+        case PZ: return "PZ";
+        case AI: return "AI";
+        case KN: return "KN";
+        case SA: return "SA";
+        }
+        return "";
+    }
+
+    unsigned short return_physics() {
+        return this->physics;
+    }
+
+    unsigned short return_math() {
+        return this->math;
+    }
+
+    unsigned short return_it() {
+        return this->it;
+    }
+
+    void fill_class(int i) {
+        int temp;
+        cout << "Студент №" << i + 1 << endl;
+        cout << "Прізвище: "; cin >> this->prizv;
+        cout << "Курс: "; cin >> this->course;
+        cout << "Спеціальність (RI=1, IK=2, PZ=3, AI=4, KN=5, SA=6): "; cin >> temp;
+        this->major = (Majors)temp;
+        cout << "Оцінка з фізики: "; cin >> this->physics;
+        cout << "Оцінка з математики: "; cin >> this->math;
+        cout << "Оцінка з інформатики: "; cin >> this->it;
+    }
+
+private:
+    string prizv;
+    unsigned short course;
+    Majors major;
+    unsigned short physics;
+    unsigned short math;
+    unsigned short it;
+};
+#pragma pack(pop)
+
+// Функція для підрахунку кількості кожної з оцінок
+void countGrades(const vector<int>& grades, int& count5, int& count4, int& count3) {
+    count5 = count4 = count3 = 0;
+    for (int grade : grades) {
+        if (grade == 5) count5++;
+        else if (grade == 4) count4++;
+        else if (grade == 3) count3++;
+    }
+}
+
+// Функція для обчислення проценту студентів, які отримали "4" або "5" з фізики та математики
+double calculatePercentage(const vector<int>& physics, const vector<int>& math) {
+    int totalStudents = physics.size();
+    int qualifiedStudents = 0;
+
+    for (size_t i = 0; i < totalStudents; i++) {
+        if ((physics[i] == 4 || physics[i] == 5) && (math[i] == 4 || math[i] == 5)) {
+            qualifiedStudents++;
+        }
+    }
+    return (static_cast<double>(qualifiedStudents) / totalStudents) * 100.0;
+}
+
+int main() {
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);
+
+    int n;
+    cout << "Введіть кількість студентів: "; cin >> n;
+
+    vector<Student> students(n);
+    vector<int> programmingGrades, physicsGrades, mathGrades;
+
+    // Заповнення даних
+    for (int i = 0; i < n; i++) {
+        students[i].fill_class(i);
+        programmingGrades.push_back(students[i].return_it());
+        physicsGrades.push_back(students[i].return_physics());
+        mathGrades.push_back(students[i].return_math());
+    }
+
+    // Завдання 1: Обчислити кількість кожної з оцінок з програмування
+    int count5, count4, count3;
+    countGrades(programmingGrades, count5, count4, count3);
+
+    cout << "\nКількість оцінок \"5\": " << count5 << endl;
+    cout << "Кількість оцінок \"4\": " << count4 << endl;
+    cout << "Кількість оцінок \"3\": " << count3 << endl;
+
+    // Завдання 2: Обчислити процент студентів з оцінками "4" або "5" з фізики та математики
+    double percentage = calculatePercentage(physicsGrades, mathGrades);
+    cout << "\nПроцент студентів з оцінками \"4\" або \"5\" з фізики та математики: " << fixed << setprecision(2) << percentage << "%" << endl;
+
+    return 0;
+}
